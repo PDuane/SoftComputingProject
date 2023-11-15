@@ -6,4 +6,4 @@
 **/*.zip
 **/genres.txt
 **/progress.txt
-**/_pycache_
+**/__pycache__
