@@ -1,4 +1,0 @@
-Application name	Music Classification Network Research
-API key	8e1ec118cef0db8b073073fa2ab54b52
-Shared secret	5f7aa445b842266f928da9d1fc921a9c
-Registered to	PDuaneNMT
