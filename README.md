@@ -17,6 +17,7 @@ This repository also has the code to train a CNN based on the one in MusicCRN. T
 
 # cnn.py
 This program will read an image dataset from a specified directory. The directory should have the format:
+```
 directory_name
   |
   --- class 1
@@ -32,5 +33,5 @@ directory_name
       --- file n
     ...
   --- class n
-
+```
 The program will then use the images to train and evaluate the neural network
