@@ -15,23 +15,24 @@ This file goes through the provided directory and processes any .mp3 or .wav int
 ## Neural Network Training
 This repository also has the code to train a CNN based on the one in MusicCRN. This is in `cnn.py`.
 
-# cnn.py
+### cnn.py
 This program will read an image dataset from a specified directory. The directory should have the format:
 ```
 directory_name
   |
   --- class 1
-      |
-      --- file 1
-      --- file 2
-        ...
-      --- file n
+  |   |
+  |   --- file 1
+  |   --- file 2
+  |     ...
+  |   --- file n
   --- class 2
-      |
-      --- file 1
-        ...
-      --- file n
-    ...
+  |   |
+  |   --- file 1
+  |     ...
+  |   --- file n
+  | ...
   --- class n
 ```
+
 The program will then use the images to train and evaluate the neural network
