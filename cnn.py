@@ -1,70 +1,74 @@
-from tensorflow import keras, data
-import os
-import glob
+import tensorflow as tf
+import random
 
 # TRAINING_RATIO = 0.8
 TESTING_RATIO = 0.2
-BATCH_SIZE = 50
-EPOCHS = 100
+# BATCH_SIZE = 200
+EPOCHS = 100 
 
 master_genres = ['rock', 'metal', 'pop', 'blues', 'country', 'classic', 'alternative', 'hip hop', 'punk', 'reggae', 'folk', 'jazz']
-root_dir = "prelim_processed"
+root_dir = "../dataset_labeled"
 
-model = keras.Sequential([
-    keras.layers.Conv2D(64, 3),
-    keras.layers.Conv2D(64, 3),
-    keras.layers.MaxPool2D(2),
+def norm(image,label):
+    image = tf.cast(image/255. ,tf.float32)
+    return image,label
 
-    keras.layers.Conv2D(128, 3),
-    keras.layers.Conv2D(128, 3),
-    keras.layers.MaxPool2D(2),
+def scheduler(epoch, lr):
+      if epoch < 10  :
+          return lr
+      else:
+          return lr * tf.math.exp(-0.1)
 
-    keras.layers.Conv2D(256, 5),
-    keras.layers.Conv2D(256, 3),
-    keras.layers.MaxPool2D(4),
+# ds = tf.keras.preprocessing.image_dataset_from_directory(IMAGE_DIR)
+# ds = ds.map(process)
 
-    keras.layers.Conv2D(512, 3),
-    keras.layers.MaxPool2D(4),
+reduce_lr = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2,
+                              patience=3, min_lr=1e-10)
 
-    keras.layers.Flatten(),
-    keras.layers.GlobalAveragePooling1D(),
-    keras.layers.Dense(1024),
-    keras.layers.Dense(512),
-    keras.layers.Dense(12, activation=keras.activations.softmax)
+model = tf.keras.Sequential([
+#     keras.layers.Input(shape=(None,256,256,3)),        
+    tf.keras.layers.Conv2D(64, 3),
+    tf.keras.layers.Conv2D(64, 3),
+    tf.keras.layers.MaxPool2D(2),
+
+    tf.keras.layers.Conv2D(128, 3),
+    tf.keras.layers.Conv2D(128, 3),
+    tf.keras.layers.MaxPool2D(2),
+
+    tf.keras.layers.Conv2D(256, 5),
+    tf.keras.layers.Conv2D(256, 3),
+    tf.keras.layers.MaxPool2D(4),
+
+    tf.keras.layers.Conv2D(512, 3),
+    tf.keras.layers.MaxPool2D(4),
+
+    # keras.layers.Flatten(),
+    tf.keras.layers.GlobalAveragePooling2D(),
+    tf.keras.layers.Dense(1024),
+    tf.keras.layers.Dense(512),
+    tf.keras.layers.Dense(12, activation=tf.keras.activations.softmax)
     # keras.layers.Softmax()
 ])
 
-model.compile(optimizer=keras.optimizers.Adam(learning_rate=1e-3),
-              loss=keras.losses.SparseCategoricalCrossentropy())
+model.compile(optimizer=tf.keras.optimizers.Adam(),
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(),
+              metrics=tf.keras.metrics.SparseCategoricalAccuracy())
 
 # genres_dict = {}
 
 # for i in range(len(master_genres)):
 #     genres_dict[master_genres[i]] = i
 
-dataset = keras.utils.image_dataset_from_directory("dataset_labeled")
 
-dataset_len = len(list(dataset))
+s = random.randint(0, 2^32 - 1)
+ds_train, ds_test = tf.keras.utils.image_dataset_from_directory("../dataset_labeled", validation_split=TESTING_RATIO, subset='both', seed=s)
 
-ds_test = dataset.take(int(TESTING_RATIO * dataset_len))
-ds_train = dataset.skip(int(TESTING_RATIO * dataset_len))
+ds_train = ds_train.map(norm)
+ds_test = ds_test.map(norm)
 
-model.fit_generator(ds_train, 50, len(list(ds_train)) // BATCH_SIZE, EPOCHS)
+lr_callbk = tf.keras.callbacks.LearningRateScheduler(scheduler)
 
-model.predict_generator(ds_test)
+history = model.fit(ds_train, epochs=EPOCHS, callbacks=[lr_callbk])
 
-# dataset = []
-
-# for root, dirs, files in os.walk(root_dir):
-#         for f in files:
-#             if f.endswith(".h3"):
-#                 file_root = os.path.join(root, f[:-3])
-#                 label = -1
-#                 with open("{}.lab".format(file_root)) as f:
-#                     label = master_genres.index(f.readline().strip())
-#                     f.close()
-                
-#                 images = glob.glob("{}*.bmp".format(file_root))
-#                 for img in images:
-#                     dataset.append
+model.evaluate(ds_test)
     

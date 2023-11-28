@@ -7,3 +7,4 @@
 **/dataset_labeled
 **/lastfm_subset
 **/preview_dataset
+**/__pycache__
