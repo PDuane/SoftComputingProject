@@ -1,10 +1,10 @@
 **/MillionSongSubset
 **/mss_preview_dataset
-**/mss_processed
-**/prelim_processed
-**/mss_preview_dataset
-**/preview_dataset
 **/dataset_labeled
 **/lastfm_subset
 **/preview_dataset
+**/full_dataset_labeled
+**/*.zip
+**/genres.txt
+**/progress.txt
 **/__pycache__
